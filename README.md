@@ -1,4 +1,4 @@
-# yektanet
+# data-table
 
 ## Project setup
 ```
