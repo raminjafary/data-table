@@ -1,33 +1,30 @@
 <script setup lang="ts">
-import { PropType, computed, ref, watch } from "vue";
-import type { DataTableRow, PaginateOption } from "@/types";
+import { PropType, computed, ref } from "vue";
+import type { DataTableRow, DataTableOption } from "@/types";
 
 const $props = defineProps({
   items: { type: Array as PropType<DataTableRow[]>, default: () => [] },
   headers: { type: Array as PropType<any[]>, default: () => [] },
-  options: {
-    type: Object as PropType<PaginateOption>,
-    default: () => ({ page: 0, itemPerPage: 10 }),
+  modelValue: {
+    type: Object as PropType<DataTableOption>,
+    default: () => ({ page: 0, itemPerPage: 10, sortBy: "name" }),
   },
 });
 
-const emit = defineEmits(["paginate"]);
+const emit = defineEmits(["update:modelValue"]);
 
-const options = ref($props.options);
+const options = ref($props.modelValue);
 
 const itemNames = computed(() => $props.headers.map((item) => item.key));
 
-function paginate() {
-  emit("paginate", options.value);
+function onChange() {
+  emit("update:modelValue", options.value);
 }
 
-watch(
-  () => $props.options,
-  (options) => {
-    options.value = options;
-    paginate();
-  }
-);
+function sortBy(key: DataTableOption["sortBy"]) {
+  options.value.sortBy = key;
+  onChange();
+}
 
 function prev() {
   if (options.value.page <= 0) {
@@ -35,7 +32,7 @@ function prev() {
   }
 
   options.value.page -= 1;
-  paginate();
+  onChange();
 }
 
 function next() {
@@ -44,7 +41,7 @@ function next() {
   }
 
   options.value.page += 1;
-  paginate();
+  onChange();
 }
 </script>
 
@@ -59,6 +56,9 @@ function next() {
                 {{ header.name }}
               </span>
             </slot>
+            <span v-if="header.sortable" @click="sortBy(header.key)"
+              >مرتب‌سازی</span
+            >
           </th>
         </tr>
       </thead>

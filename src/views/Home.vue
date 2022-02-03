@@ -1,66 +1,74 @@
 <script setup lang="ts">
+//? vue
 import { ref, reactive, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useDebounceRef } from "@/composable/useDebounceRef";
-import cleanEmptyProps from "@/utils/cleanEmptyProps";
-import BST from "@/utils/BST";
-import type { PaginateOption, DataTableRow } from "@/types";
+//? components
 import DataTable from "@/components/DataTable.vue";
 import InputText from "@/components/InputText.vue";
+//? utils
+import { useDebounceRef } from "@/composable/useDebounceRef";
+import cleanEmptyProps from "@/utils/cleanEmptyProps";
+import sortByField from "@/utils/sortByField";
+import BST from "@/utils/BST";
 import JSONData from "@/data.json";
+//? types
+import type { DataTableOption, DataTableRow } from "@/types";
 
 const $router = useRouter();
 const $route = useRoute();
 
-const bst = new BST(JSONData);
+const bst = new BST(JSONData as DataTableRow[]);
 
 const options = ref({
   itemPerPage: 20,
   page: Number($route.query?.page) || 0,
-} as PaginateOption);
+  sortBy: "name",
+} as DataTableOption);
 
-const name = ref($route.query?.name ?? "");
+const name = ref($route.query?.name?.toString() ?? "");
 const debouncedName = useDebounceRef(name);
 
-const field = ref($route.query?.field ?? "");
+const field = ref($route.query?.field?.toString() ?? "");
 const debouncedField = useDebounceRef(field);
 
-const title = ref($route.query?.title ?? "");
+const title = ref($route.query?.title?.toString() ?? "");
 const debouncedTitle = useDebounceRef(title);
 
-const date = ref($route.query?.date ?? "");
+const date = ref($route.query?.date?.toString() ?? "");
 const debouncedDate = useDebounceRef(date);
 
 const headers = reactive([
   {
     name: "نام تغییر دهنده",
     key: "name",
+    sortable: true,
   },
   {
     name: "تاریخ",
     key: "date",
+    sortable: true,
   },
   {
     name: "فیلد",
     key: "field",
+    sortable: true,
   },
   {
     name: "عنوان آگهی",
     key: "title",
+    sortable: true,
   },
   {
     name: "مقدار قدیمی",
     key: "old_value",
+    sortable: true,
   },
   {
     name: "مقدار جدید",
     key: "new_value",
+    sortable: true,
   },
 ]);
-
-function paginate(options: PaginateOption) {
-  options.value = options;
-}
 
 watch(
   [
@@ -93,26 +101,29 @@ const filteredData = computed(() => {
   );
 });
 
-const paginatedData = computed(() => {
-  return filteredData.value.slice(
-    options.value.page * options.value.itemPerPage,
-    (options.value.page + 1) * options.value.itemPerPage
-  );
-});
-
 const dateFiltered = computed(() => {
   return debouncedDate.value
     ? bst.find(bst.root, debouncedDate.value)
     : JSONData;
 });
+
+const paginatedData = computed(() => {
+  return sortedData.value.slice(
+    options.value.page * options.value.itemPerPage,
+    (options.value.page + 1) * options.value.itemPerPage
+  );
+});
+
+const sortedData = computed(() => {
+  return sortByField(filteredData.value, options.value.sortBy);
+});
 </script>
 
 <template>
   <DataTable
+    v-model="options"
     :items="paginatedData as DataTableRow[]"
     :headers="headers"
-    :options="options"
-    @paginate="paginate"
   >
     <template v-slot:[`header.name`]="{ header }">
       <InputText v-model="name" />

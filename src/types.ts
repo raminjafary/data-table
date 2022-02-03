@@ -8,7 +8,8 @@ export type DataTableRow = {
   new_value: string;
 };
 
-export type PaginateOption = {
+export type DataTableOption = {
   page: number;
   itemPerPage: number;
+  sortBy: keyof DataTableRow;
 };

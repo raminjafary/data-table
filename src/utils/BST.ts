@@ -13,7 +13,7 @@ class BSTNode {
 }
 
 export default class BST {
-  private root!: BSTNode | null;
+  public root!: BSTNode | null;
   static instance: BST | null;
 
   constructor(public data: DataTableRow[]) {
