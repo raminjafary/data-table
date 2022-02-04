@@ -1,9 +1,9 @@
 import type { DataTableRow } from "@/types";
 
 class BSTNode {
-  public left!: BSTNode | null;
-  public right!: BSTNode | null;
-  public data!: DataTableRow[];
+  left!: BSTNode | null;
+  right!: BSTNode | null;
+  data!: DataTableRow[];
 
   constructor() {
     this.data = [];
@@ -13,7 +13,7 @@ class BSTNode {
 }
 
 export default class BST {
-  public root!: BSTNode | null;
+  #root!: BSTNode | null;
   static instance: BST | null;
 
   constructor(public data: DataTableRow[]) {
@@ -22,19 +22,23 @@ export default class BST {
     }
     BST.instance = this;
 
-    this.root = null;
+    this.#root = null;
 
     for (const d of data) {
       this.insert(d);
     }
   }
 
+  get rootNode () {
+    return this.#root
+  }
+
   insert(data: DataTableRow) {
-    if (this.root == null) {
-      this.root = new BSTNode();
-      this.root.data.push(data);
+    if (this.#root == null) {
+      this.#root = new BSTNode();
+      this.#root.data.push(data);
     } else {
-      this.insertNode(this.root, data);
+      this.insertNode(this.#root, data);
     }
   }
 
@@ -58,7 +62,7 @@ export default class BST {
     }
   }
 
-  find(node: BSTNode | null = this.root, date: string): DataTableRow[] {
+  find(node: BSTNode | null = this.#root, date: string): DataTableRow[] {
     if (node == null) return [];
     else if (date < node.data[0].date) {
       return this.find(node.left, date);

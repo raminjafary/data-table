@@ -110,7 +110,7 @@ watch(
 
 const dateFiltered = computed(() => {
   return debouncedDate.value
-    ? bst.find(bst.root, debouncedDate.value)
+    ? bst.find(bst.rootNode, debouncedDate.value)
     : JSONData;
 });
 
