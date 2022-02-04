@@ -26,16 +26,16 @@ const options = ref({
   sortBy: $route.query?.sortBy || "",
 } as DataTableOption);
 
-const name = ref($route.query?.name?.toString() ?? "");
+const name = ref(($route.query?.name as string) ?? "");
 const debouncedName = useDebounceRef(name);
 
-const field = ref($route.query?.field?.toString() ?? "");
+const field = ref(($route.query?.field as string) ?? "");
 const debouncedField = useDebounceRef(field);
 
-const title = ref($route.query?.title?.toString() ?? "");
+const title = ref(($route.query?.title as string) ?? "");
 const debouncedTitle = useDebounceRef(title);
 
-const date = ref($route.query?.date?.toString() ?? "");
+const date = ref(($route.query?.date as string) ?? "");
 const debouncedDate = useDebounceRef(date);
 
 const {
@@ -163,29 +163,38 @@ function getRowData(data: DataTableRow) {
   >
     <template v-slot:[`header.name`]="{ header }">
       <InputText v-model="name" />
-      <span>
+      <span class="pt-8 inline-block">
         {{ header.name }}
       </span>
     </template>
 
     <template v-slot:[`header.field`]="{ header }">
       <InputText v-model="field" />
-      <span>
+      <span class="pt-8 inline-block">
         {{ header.name }}
       </span>
     </template>
 
     <template v-slot:[`header.title`]="{ header }">
       <InputText v-model="title" />
-      <span>
+      <span class="pt-8 inline-block">
         {{ header.name }}
       </span>
     </template>
     <template v-slot:[`header.date`]="{ header }">
       <InputText type="date" v-model="date" />
-      <span>
+      <span class="pt-8 inline-block">
         {{ header.name }}
       </span>
     </template>
   </DataTable>
 </template>
+<style scoped>
+.pt-8 {
+  padding-top: 8px;
+}
+
+.inline-block {
+  display: inline-block;
+}
+</style>

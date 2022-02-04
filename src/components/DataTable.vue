@@ -65,9 +65,16 @@ function shouldMarkRowById(id: number) {
                 {{ header.name }}
               </span>
             </slot>
-            <span v-if="header.sortable" @click="sortBy(header.key)"
-              >مرتب‌سازی</span
+            <span
+              class="data-table__sort"
+              v-if="header.sortable"
+              @click="sortBy(header.key)"
+              :class="{
+                'data-table__sort--active': options.sortBy === header.key,
+              }"
             >
+              {{ options.sortBy === header.key ? "&darr;" : "&uarr;" }}
+            </span>
           </th>
         </tr>
       </thead>
@@ -82,10 +89,9 @@ function shouldMarkRowById(id: number) {
             <td
               v-for="(name, index) in itemNames"
               :key="index"
-              class="data-table__header"
             >
               <slot :item="item" :name="'item.' + name" :on="{ click }">
-                <span class="data-table__content">
+                <span class="data-table__row-ontent">
                   {{ item[name as keyof DataTableRow] }}
                 </span>
               </slot>
@@ -99,7 +105,7 @@ function shouldMarkRowById(id: number) {
         </template>
       </tbody>
     </table>
-    <div class="data-table__btns">
+    <div class="data-table__pagination">
       <slot name="pagination" :on="{ prev, next }">
         <button @click="prev">&lsaquo;</button>
         <button @click="next">&rsaquo;</button>
@@ -109,9 +115,9 @@ function shouldMarkRowById(id: number) {
 </template>
 <style scoped>
 .data-table {
-  padding: 30px 0;
-  border-radius: 8px;
-  border: 1px solid #b0b0b0;
+  padding: 3rem 0;
+  border-radius: 0.8rem;
+  border: 0.1rem solid var(--color-mild-gray);
   padding: 0;
   max-width: 100%;
   margin: auto 16px;
@@ -119,42 +125,41 @@ function shouldMarkRowById(id: number) {
 }
 
 table {
-  padding: 30px 0;
+  padding: 3rem 0;
   width: 100%;
   padding: 0;
-  border-bottom: 1px solid rgb(128, 128, 128);
+  border-bottom: 0.1rem solid var(--color-solid-gray);
 }
 
 thead {
-  border-bottom: 1px solid rgb(128, 128, 128);
-  padding: 16px;
+  border-bottom: 0.1rem solid var(--color-solid-gray);
+  padding: 1.6rem;
   display: flex;
-  justify-content: space-between;
   position: sticky;
+  justify-content: space-between;
 }
 
 thead tr {
   display: flex;
-  font-size: 1.6rem;
+  font-size: var(--text-16);
 }
 
 .data-table__header {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  color: var(--color-solid-black);
 }
 
 .data-table__title {
-  font-size: 1.6rem;
+  font-size: var(--text-16);
+  font-weight: 700;
 }
 
-.data-table__content {
-  font-size: 1.2rem;
+.data-table__row-ontent {
+  font-size: var(--text-12);
 }
 
 tbody {
   overflow-y: auto;
-  height: 600px;
+  height: 60rem;
   display: block;
   width: 100%;
 }
@@ -163,7 +168,7 @@ tbody tr {
   height: fit-content;
   display: flex;
   justify-content: space-between;
-  min-height: 50px;
+  min-height: 5rem;
   cursor: pointer;
 }
 
@@ -172,56 +177,53 @@ td {
 }
 
 tbody tr:nth-child(even) {
-  background-color: rgba(0, 0, 0, 0.06);
+  background-color: var(--color-striped-row);
 }
 
 th,
 td {
-  width: 156px;
+  width: 17rem;
+  margin: auto;
 }
 
-input {
-  border-radius: 0.4rem;
-  font-size: 1.6rem;
-  flex: 1 1 auto;
-  padding: 0.8rem;
-  max-width: 100%;
-  min-width: 0;
-  box-shadow: none;
-  margin-bottom: 0.8rem;
-}
-
-input:focus {
-  outline-color: blue;
-}
-
-.data-table__btns {
+.data-table__pagination {
   padding: 1.6rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
 
-.data-table__btns button {
+.data-table__pagination button {
   all: unset;
   font-size: 3rem;
-  width: 25px;
-  height: 25px;
+  width: 2.5rem;
+  height: 2.5rem;
   margin: auto 1.6rem;
 }
 
 .data-table__no-result {
   display: flex;
-  height: 100%;
   justify-content: center;
   align-items: center;
-  font-size: 1.6rem;
+  height: 100%;
+  font-size: var(--text-16);
 }
 
 .data-table__row---marked {
-  background-color: #00bcd4 !important;
-  color: white;
-  border-bottom: 1px solid white;
-  font-weight: 800;
+  font-weight: 700;
+  background-color: var(--color-blue) !important;
+  color: var(--color-white);
+  border-bottom: 0.1rem solid var(--color-white);
+}
+.data-table__sort {
+  font-size: 1.5rem;
+  opacity: 0.4;
+  cursor: pointer;
+  padding: 0.4rem;
+}
+
+.data-table__sort--active {
+  opacity: 1;
+  font-weight: bold;
 }
 </style>

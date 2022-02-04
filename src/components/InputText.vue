@@ -35,18 +35,22 @@ export default {
   />
 </template>
 <style scoped>
+label {
+  color: var(--color-mild-black);
+}
+
 input {
+  color: var(--color-mild-black);
   border-radius: 0.4rem;
   font-size: 1.6rem;
-  flex: 1 1 auto;
   padding: 0.6rem;
   max-width: 100%;
   min-width: 0;
-  box-shadow: none;
-  margin-bottom: 0.8rem;
+  height: 38px;
+  border: 1px solid var(--color-mild-black);
 }
 
 input:focus {
-  outline-color: blue;
+  outline-color: var(--color-solid-black);
 }
 </style>
