@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { PropType } from "vue";
+//? types
+import type { PropType } from "vue";
 
 defineProps({
   modelValue: { type: String as PropType<string>, default: "" },

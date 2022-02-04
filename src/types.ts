@@ -11,5 +11,11 @@ export type DataTableRow = {
 export type DataTableOption = {
   page: number;
   itemPerPage: number;
-  sortBy: keyof DataTableRow;
+  sortBy: keyof DataTableRow | '';
+};
+
+export type DataTableHeaders = {
+  name: string;
+  key: keyof DataTableRow;
+  sortable: boolean;
 };

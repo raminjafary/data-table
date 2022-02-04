@@ -7,12 +7,13 @@ import DataTable from "@/components/DataTable.vue";
 import InputText from "@/components/InputText.vue";
 //? utils
 import { useDebounceRef } from "@/composable/useDebounceRef";
+import { useLocalStorage } from "@/composable/useLocalStorage";
 import cleanEmptyProps from "@/utils/cleanEmptyProps";
 import sortByField from "@/utils/sortByField";
-import BST from "@/utils/BST";
+import BST from "@/utils/bst";
 import JSONData from "@/data.json";
 //? types
-import type { DataTableOption, DataTableRow } from "@/types";
+import type { DataTableOption, DataTableRow, DataTableHeaders } from "@/types";
 
 const $router = useRouter();
 const $route = useRoute();
@@ -22,7 +23,7 @@ const bst = new BST(JSONData as DataTableRow[]);
 const options = ref({
   itemPerPage: 20,
   page: Number($route.query?.page) || 0,
-  sortBy: "name",
+  sortBy: "",
 } as DataTableOption);
 
 const name = ref($route.query?.name?.toString() ?? "");
@@ -36,6 +37,12 @@ const debouncedTitle = useDebounceRef(title);
 
 const date = ref($route.query?.date?.toString() ?? "");
 const debouncedDate = useDebounceRef(date);
+
+const {
+  item: staredRowIds,
+  setItem: setStaredRowIds,
+  getItem: getStaredRowIds,
+} = useLocalStorage("staredRowIds");
 
 const headers = reactive([
   {
@@ -68,7 +75,7 @@ const headers = reactive([
     key: "new_value",
     sortable: true,
   },
-]);
+] as DataTableHeaders[]);
 
 watch(
   [
@@ -98,7 +105,7 @@ const filteredData = computed(() => {
       ad.name.toLowerCase().includes(debouncedName.value) &&
       ad.field.toLowerCase().includes(debouncedField.value) &&
       ad.title.toLowerCase().includes(debouncedTitle.value)
-  );
+  ) as DataTableRow[];
 });
 
 const dateFiltered = computed(() => {
@@ -115,8 +122,26 @@ const paginatedData = computed(() => {
 });
 
 const sortedData = computed(() => {
-  return sortByField(filteredData.value, options.value.sortBy);
+  return options.value.sortBy
+    ? sortByField(filteredData.value, options.value.sortBy)
+    : filteredData.value;
 });
+
+function getRowData(data: DataTableRow) {
+  getStaredRowIds();
+
+  let staredIds: number[] = staredRowIds.value || [];
+
+  if (staredIds.includes(data.id)) {
+    staredIds = staredIds.filter((id) => id !== data.id);
+  } else {
+    staredIds.push(data.id);
+  }
+
+  staredRowIds.value = [...staredIds];
+
+  setStaredRowIds(staredRowIds.value);
+}
 </script>
 
 <template>
@@ -124,6 +149,8 @@ const sortedData = computed(() => {
     v-model="options"
     :items="paginatedData as DataTableRow[]"
     :headers="headers"
+    :markRows="staredRowIds"
+    @click="getRowData"
   >
     <template v-slot:[`header.name`]="{ header }">
       <InputText v-model="name" />

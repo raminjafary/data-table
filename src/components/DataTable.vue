@@ -1,24 +1,25 @@
 <script setup lang="ts">
 import { PropType, computed, ref } from "vue";
-import type { DataTableRow, DataTableOption } from "@/types";
+import type { DataTableRow, DataTableOption, DataTableHeaders } from "@/types";
 
 const $props = defineProps({
   items: { type: Array as PropType<DataTableRow[]>, default: () => [] },
-  headers: { type: Array as PropType<any[]>, default: () => [] },
+  headers: { type: Array as PropType<DataTableHeaders[]>, default: () => [] },
+  markRows: { ype: Array as PropType<number[]>, default: () => [] },
   modelValue: {
     type: Object as PropType<DataTableOption>,
     default: () => ({ page: 0, itemPerPage: 10, sortBy: "name" }),
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const $emit = defineEmits(["update:modelValue", "click"]);
 
 const options = ref($props.modelValue);
 
 const itemNames = computed(() => $props.headers.map((item) => item.key));
 
 function onChange() {
-  emit("update:modelValue", options.value);
+  $emit("update:modelValue", options.value);
 }
 
 function sortBy(key: DataTableOption["sortBy"]) {
@@ -43,6 +44,14 @@ function next() {
   options.value.page += 1;
   onChange();
 }
+
+function click(data: DataTableRow) {
+  $emit("click", data);
+}
+
+function shouldMarkRowById(id: number) {
+  return $props.markRows?.includes(id);
+}
 </script>
 
 <template>
@@ -64,13 +73,18 @@ function next() {
       </thead>
       <tbody>
         <template v-if="items.length">
-          <tr v-for="(item, index) in items" :key="index">
+          <tr
+            v-for="(item, index) in items"
+            :key="index"
+            :class="{ 'data-table__row---marked': shouldMarkRowById(item.id) }"
+            @click="click(item)"
+          >
             <td
               v-for="(name, index) in itemNames"
               :key="index"
               class="data-table__header"
             >
-              <slot :item="item" :name="'item.' + name">
+              <slot :item="item" :name="'item.' + name" :on="{ click }">
                 <span class="data-table__content">
                   {{ item[name as keyof DataTableRow] }}
                 </span>
@@ -86,8 +100,10 @@ function next() {
       </tbody>
     </table>
     <div class="data-table__btns">
-      <button @click="prev">&lsaquo;</button>
-      <button @click="next">&rsaquo;</button>
+      <slot name="pagination" :on="{ prev, next }">
+        <button @click="prev">&lsaquo;</button>
+        <button @click="next">&rsaquo;</button>
+      </slot>
     </div>
   </div>
 </template>
@@ -148,6 +164,7 @@ tbody tr {
   display: flex;
   justify-content: space-between;
   min-height: 50px;
+  cursor: pointer;
 }
 
 td {
@@ -155,7 +172,7 @@ td {
 }
 
 tbody tr:nth-child(even) {
-  background-color: rgba(0, 0, 0, 0.06) !important;
+  background-color: rgba(0, 0, 0, 0.06);
 }
 
 th,
@@ -199,5 +216,12 @@ input:focus {
   justify-content: center;
   align-items: center;
   font-size: 1.6rem;
+}
+
+.data-table__row---marked {
+  background-color: #00bcd4 !important;
+  color: white;
+  border-bottom: 1px solid white;
+  font-weight: 800;
 }
 </style>
