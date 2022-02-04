@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { PropType, computed, ref } from "vue";
+//? vue
+import { computed, ref } from "vue";
+//? components
+import Pagination from "@/components/Pagination.vue";
+//? types
 import type { DataTableRow, DataTableOption, DataTableHeaders } from "@/types";
+import type { PropType } from "vue";
 
 const $props = defineProps({
   items: { type: Array as PropType<DataTableRow[]>, default: () => [] },
@@ -24,24 +29,6 @@ function onChange() {
 
 function sortBy(key: DataTableOption["sortBy"]) {
   options.value.sortBy = options.value.sortBy === key ? "" : key;
-  onChange();
-}
-
-function prev() {
-  if (options.value.page <= 0) {
-    return;
-  }
-
-  options.value.page -= 1;
-  onChange();
-}
-
-function next() {
-  if (!$props.items.length) {
-    return;
-  }
-
-  options.value.page += 1;
   onChange();
 }
 
@@ -86,10 +73,7 @@ function shouldMarkRowById(id: number) {
             :class="{ 'data-table__row---marked': shouldMarkRowById(item.id) }"
             @click="click(item)"
           >
-            <td
-              v-for="(name, index) in itemNames"
-              :key="index"
-            >
+            <td v-for="(name, index) in itemNames" :key="index">
               <slot :item="item" :name="'item.' + name" :on="{ click }">
                 <span class="data-table__row-ontent">
                   {{ item[name as keyof DataTableRow] }}
@@ -105,12 +89,7 @@ function shouldMarkRowById(id: number) {
         </template>
       </tbody>
     </table>
-    <div class="data-table__pagination">
-      <slot name="pagination" :on="{ prev, next }">
-        <button @click="prev">&lsaquo;</button>
-        <button @click="next">&rsaquo;</button>
-      </slot>
-    </div>
+    <Pagination v-model="options.page" />
   </div>
 </template>
 <style scoped>
@@ -182,23 +161,8 @@ tbody tr:nth-child(even) {
 
 th,
 td {
-  width: 17rem;
+  width: 20rem;
   margin: auto;
-}
-
-.data-table__pagination {
-  padding: 1.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.data-table__pagination button {
-  all: unset;
-  font-size: 3rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  margin: auto 1.6rem;
 }
 
 .data-table__no-result {
