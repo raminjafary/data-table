@@ -4,7 +4,7 @@ export default function sortByField(
   items: DataTableRow[],
   field: keyof DataTableRow
 ) {
-  return items.sort((a, b) => {
+  return [...items].sort((a, b) => {
     if (a[field] < b[field]) {
       return -1;
     } else if (a[field] > b[field]) {

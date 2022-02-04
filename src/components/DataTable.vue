@@ -23,7 +23,7 @@ function onChange() {
 }
 
 function sortBy(key: DataTableOption["sortBy"]) {
-  options.value.sortBy = key;
+  options.value.sortBy = options.value.sortBy === key ? "" : key;
   onChange();
 }
 
@@ -50,7 +50,7 @@ function click(data: DataTableRow) {
 }
 
 function shouldMarkRowById(id: number) {
-  return $props.markRows?.includes(id);
+  return ($props.markRows as number[])?.includes(id);
 }
 </script>
 

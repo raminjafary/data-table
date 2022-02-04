@@ -1,4 +1,4 @@
-export default function cleanEmptyProps(obj: any): any {
+export default function cleanEmptyProps(obj: Record<string, any>) {
   for (const prop in obj) {
     if (obj[prop] && typeof obj[prop] === "object") {
       cleanEmptyProps(obj[prop]);

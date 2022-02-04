@@ -23,7 +23,7 @@ const bst = new BST(JSONData as DataTableRow[]);
 const options = ref({
   itemPerPage: 20,
   page: Number($route.query?.page) || 0,
-  sortBy: "",
+  sortBy: $route.query?.sortBy || "",
 } as DataTableOption);
 
 const name = ref($route.query?.name?.toString() ?? "");
@@ -84,8 +84,16 @@ watch(
     debouncedField,
     debouncedDate,
     () => options.value.page,
+    () => options.value.sortBy,
   ],
-  ([debouncedTitle, debouncedName, debouncedField, debouncedDate, page]) => {
+  ([
+    debouncedTitle,
+    debouncedName,
+    debouncedField,
+    debouncedDate,
+    page,
+    sortBy,
+  ]) => {
     $router.replace({
       path: $route.fullPath,
       query: cleanEmptyProps({
@@ -93,11 +101,18 @@ watch(
         name: debouncedName,
         field: debouncedField,
         date: debouncedDate,
+        sortBy,
         page,
       }),
     });
   }
 );
+
+const dateFiltered = computed(() => {
+  return debouncedDate.value
+    ? bst.find(bst.root, debouncedDate.value)
+    : JSONData;
+});
 
 const filteredData = computed(() => {
   return dateFiltered.value.filter(
@@ -108,10 +123,10 @@ const filteredData = computed(() => {
   ) as DataTableRow[];
 });
 
-const dateFiltered = computed(() => {
-  return debouncedDate.value
-    ? bst.find(bst.root, debouncedDate.value)
-    : JSONData;
+const sortedData = computed(() => {
+  return options.value.sortBy
+    ? sortByField(filteredData.value, options.value.sortBy)
+    : filteredData.value;
 });
 
 const paginatedData = computed(() => {
@@ -119,12 +134,6 @@ const paginatedData = computed(() => {
     options.value.page * options.value.itemPerPage,
     (options.value.page + 1) * options.value.itemPerPage
   );
-});
-
-const sortedData = computed(() => {
-  return options.value.sortBy
-    ? sortByField(filteredData.value, options.value.sortBy)
-    : filteredData.value;
 });
 
 function getRowData(data: DataTableRow) {
@@ -147,7 +156,7 @@ function getRowData(data: DataTableRow) {
 <template>
   <DataTable
     v-model="options"
-    :items="paginatedData as DataTableRow[]"
+    :items="paginatedData"
     :headers="headers"
     :markRows="staredRowIds"
     @click="getRowData"
