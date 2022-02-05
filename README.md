@@ -20,5 +20,8 @@ pnpm run build
 pnpm run lint
 ```
 
+Note: Use Volar instead of Vetur vscode extension for better type checking and inference!
+
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
