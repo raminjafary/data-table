@@ -29,8 +29,8 @@ export default class BST {
     }
   }
 
-  get rootNode () {
-    return this.#root
+  get rootNode() {
+    return this.#root;
   }
 
   insert(data: DataTableRow) {
