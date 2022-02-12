@@ -48,16 +48,17 @@ function shouldMarkRowById(id: number) {
         <tr v-for="(header, index) in headers" :key="index">
           <th class="data-table__header">
             <slot :header="header" :name="'header.' + header.key">
-              <span class="data-table__title">
+              <span class="data-table__header-title">
                 {{ header.name }}
               </span>
             </slot>
             <span
-              class="data-table__sort"
+              class="data-table__header-sort"
               v-if="header.sortable"
               @click="sortBy(header.key)"
               :class="{
-                'data-table__sort--active': options.sortBy === header.key,
+                'data-table__header-sort--active':
+                  options.sortBy === header.key,
               }"
             >
               {{ options.sortBy === header.key ? "&darr;" : "&uarr;" }}
@@ -70,7 +71,7 @@ function shouldMarkRowById(id: number) {
           <tr
             v-for="(item, index) in items"
             :key="index"
-            :class="{ 'data-table__row---marked': shouldMarkRowById(item.id) }"
+            :class="{ 'data-table__row--marked': shouldMarkRowById(item.id) }"
             @click="click(item)"
           >
             <td v-for="(name, index) in itemNames" :key="index">
@@ -127,7 +128,7 @@ thead tr {
   color: var(--color-solid-black);
 }
 
-.data-table__title {
+.data-table__header-title {
   font-size: var(--text-16);
   font-weight: 700;
 }
@@ -173,20 +174,20 @@ td {
   font-size: var(--text-16);
 }
 
-.data-table__row---marked {
+.data-table__row--marked {
   font-weight: 700;
   background-color: var(--color-blue) !important;
   color: var(--color-white);
   border-bottom: 0.1rem solid var(--color-white);
 }
-.data-table__sort {
+.data-table__header-sort {
   font-size: 1.5rem;
   opacity: 0.4;
   cursor: pointer;
   padding: 0.4rem;
 }
 
-.data-table__sort--active {
+.data-table__header-sort--active {
   opacity: 1;
   font-weight: bold;
 }
